@@ -1,6 +1,6 @@
 ---
 name: gaya-diagram
-description: Cara membuat diagram, bagan alur, arsitektur sistem, swimlane, peta proses, flowchart, peta pikiran, tangga kematangan, atau infografis yang rapi, lega, tegas warnanya, dan enak dilihat — bukan penuh, pudar, dan bertumpuk. Pakai skill ini setiap kali diminta memvisualisasikan sesuatu sebagai bagan atau diagram (system design, alur kerja, alur klien, pemetaan dokumen, "gambarkan", "visualisasikan", "bikin bagan", "buat alurnya", "petakan"), juga saat memilih alat (HTML/SVG, draw.io, Excalidraw, FigJam, Mermaid, gambar AI) atau saat memperbaiki diagram yang dinilai jelek, ramai, atau kusam. Use for any diagram, flowchart, architecture, swimlane, or infographic request, even if the user only says "visualize this".
+description: Cara membuat diagram, bagan alur, arsitektur sistem, swimlane, peta proses, flowchart, peta pikiran, tangga kematangan, atau infografis yang rapi, lega, tegas warnanya, dan enak dilihat — bukan penuh, pudar, dan bertumpuk. Pakai skill ini setiap kali diminta memvisualisasikan sesuatu sebagai bagan atau diagram (system design, alur kerja, alur klien, pemetaan dokumen, "gambarkan", "visualisasikan", "bikin bagan", "buat alurnya", "petakan"), juga saat memilih alat (HTML/SVG, draw.io, Excalidraw, FigJam, Mermaid) atau saat memperbaiki diagram yang dinilai jelek, ramai, atau kusam. Use for any diagram, flowchart, architecture, swimlane, or infographic request, even if the user only says "visualize this".
 ---
 
 # Gaya Diagram
@@ -34,12 +34,11 @@ Jenis bagan yang tepat sudah menyelesaikan separuh masalah kerapian, karena seti
 
 ### 3. Pilih medium
 
-- **HTML + SVG tulis tangan** (bawaan): kendali penuh atas tampilan, mendukung mode gelap, bisa dianimasikan. Pakai generator swimlane bila jenisnya swimlane.
+- **HTML + SVG tulis tangan** (bawaan, dan pilihan utama untuk infografis juga; pengguna memutuskan tidak memakai model gambar AI seperti Nano Banana): kendali penuh atas tampilan, mendukung mode gelap, bisa dianimasikan. Pakai generator swimlane bila jenisnya swimlane.
 - **draw.io** (bila MCP-nya tersambung): saat pengguna perlu menyunting dan merawat diagram sendiri.
 - **Excalidraw**: sketsa diskusi bergaya coret tangan. Bukan untuk dokumen resmi.
 - **FigJam / Figma**: saat hasil akan dipoles manual atau dikomentari tim.
 - **Mermaid**: diagram yang hidup di repo atau dokumen Markdown. Tampilan terbatas, jangan dipakai untuk hasil yang harus memukau.
-- **Gambar AI** (Nano Banana Pro, GPT Image): infografis media sosial yang padat. Claude tidak membuat gambar sendiri. Bila kunci Gemini API tersedia di variabel lingkungan, `scripts/gambar_ai.py` bisa memanggilnya; bila tidak, tuliskan prompt siap tempel. Lihat `references/prompt-gambar-ai.md`, dan ingatkan bahwa setiap label dan angka harus dicek.
 - **Animasi**: HTML dengan animasi CSS/SVG, direkam ke video dengan Playwright bila diminta video.
 
 ### 4. Pasang anggaran isi sebelum menggambar
