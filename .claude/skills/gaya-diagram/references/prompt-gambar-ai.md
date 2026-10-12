@@ -38,6 +38,6 @@ GEMINI_API_KEY_FILE=/path/ke/berkas-kunci python3 scripts/gambar_ai.py prompt.tx
 ```
 
 - Jangan menulis kunci ke skill, repo, prompt, atau balasan.
-- Model gambar di Gemini API tidak punya kuota gratis (per Okt 2026 batasnya 0 untuk tier gratis). Respons `429 ... free_tier_requests, limit: 0` berarti penagihan (billing) belum aktif di proyek Google AI Studio itu, bukan kuncinya salah. Jangan mencoba berulang; sampaikan ke pengguna.
+- Model gambar di Gemini API tidak punya kuota gratis. Teruji 12 Okt 2026: `gemini-3-pro-image`, `gemini-3.1-flash-image`, dan `gemini-3.1-flash-lite-image` semuanya berbatas 0 di tier gratis. Untuk trial gratis, arahkan pengguna ke aplikasi Gemini (gemini.google.com) dengan prompt siap tempel. Respons `429 ... free_tier_requests, limit: 0` berarti penagihan (billing) belum aktif di proyek Google AI Studio itu, bukan kuncinya salah. Jangan mencoba berulang; sampaikan ke pengguna.
 - Daftar model yang tersedia bisa dicek dengan `GET https://generativelanguage.googleapis.com/v1beta/models` memakai header `X-goog-api-key`.
 - Buat satu gambar, periksa, baru ulangi. Setiap panggilan berbayar.
