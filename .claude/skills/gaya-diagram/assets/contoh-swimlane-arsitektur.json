@@ -1,0 +1,68 @@
+{
+  "judul": "Arsitektur Sistem ANS",
+  "eyebrow": "ANS · keadaan per 12 Okt 2026",
+  "deskripsi": "Satu putaran kerja kantor ANS, dari arahan Ivan sampai app dipakai pengguna. Ikuti langkah 01 sampai 10.",
+  "aria": "Alur kerja ANS sekarang dalam 10 langkah lintas empat jalur: Ivan memberi arahan, Cowork menyusun surat, pos dan agent utama di server membagi tugas, pekerja membuat di bengkel, bot GitHub membuka PR, Ivan memberi restu, mesin rilis memasang ke etalase, pengguna memakai app.",
+  "lingkup": {
+    "judul": "Yang digambar adalah keadaan sekarang.",
+    "isi": "Arsitektur ideal belum ada di brief, karena itu yang sedang diriset GPT. Lencana merah adalah masalah yang sudah terbukti."
+  },
+  "jalur": [
+    {"id": "own", "nama": "Owner", "sub": "Ivan", "warna": "ink", "ikon": "crown", "penanda": ["P3"]},
+    {"id": "lap", "nama": "Laptop Ivan", "sub": "Claude desktop", "warna": "violet", "ikon": "laptop", "penanda": ["P4", "P8", "P10", "P11"]},
+    {"id": "srv", "nama": "Server ANS-1A", "sub": "1 VPS · 1 user", "warna": "blue", "ikon": "server", "penanda": ["P6", "P9"]},
+    {"id": "ext", "nama": "Layanan luar", "sub": "GitHub · akun AI", "warna": "teal", "ikon": "cloud", "penanda": ["P5"]}
+  ],
+  "langkah": [
+    {"id": "ivan", "kolom": 1, "jalur": "own", "ikon": "person", "judul": "Ivan", "ket": ["arahan &", "keputusan bisnis"]},
+    {"id": "cowork", "kolom": 2, "jalur": "lap", "ikon": "chat", "judul": "Cowork", "ket": ["perencana,", "menyusun surat"]},
+    {"id": "pos", "kolom": 3, "jalur": "srv", "ikon": "mail", "judul": "Pos / bel", "ket": ["menerima &", "mengantar surat"], "penanda": ["P2"]},
+    {"id": "agent", "kolom": 4, "jalur": "srv", "ikon": "hub", "judul": "Agent utama", "ket": ["sesi Claude Code,", "membagi tugas"], "penanda": ["P1"]},
+    {"id": "pekerja", "kolom": 5, "jalur": "srv", "ikon": "tool", "judul": "Pekerja", "ket": ["Claude / Codex,", "kode · UAT · uji"]},
+    {"id": "pr", "kolom": 6, "jalur": "ext", "ikon": "branch", "judul": "GitHub PR", "ket": ["lewat bot kantor", "+ uji otomatis"], "penanda": ["P7"]},
+    {"id": "restu", "kolom": 7, "jalur": "own", "ikon": "check", "judul": "Restu Ivan", "ket": ["notif Telegram", "→ tekan Merge"]},
+    {"id": "rilis", "kolom": 8, "jalur": "srv", "ikon": "rocket", "judul": "Mesin rilis", "ket": ["pasang otomatis,", "gagal → kembali"]},
+    {"id": "etalase", "kolom": 9, "jalur": "srv", "ikon": "store", "judul": "Etalase", "ket": ["app produksi,", "tanpa tangan agen"]},
+    {"id": "pengguna", "kolom": 10, "jalur": "ext", "ikon": "users", "judul": "Pengguna", "ket": ["klien & pengguna,", "kunci AI klien"]}
+  ],
+  "garis": [
+    {"dari": "ivan", "ke": "cowork"},
+    {"dari": "cowork", "ke": "pos"},
+    {"dari": "pos", "ke": "agent"},
+    {"dari": "agent", "ke": "pekerja"},
+    {"dari": "pekerja", "ke": "pr"},
+    {"dari": "pr", "ke": "restu"},
+    {"dari": "restu", "ke": "rilis", "jenis": "rilis"},
+    {"dari": "rilis", "ke": "etalase", "jenis": "rilis"},
+    {"dari": "etalase", "ke": "pengguna"}
+  ],
+  "sampingan": [
+    {"jalur": "lap", "kolom": 3, "lebar_kolom": 1.4, "dari": "cowork", "judul": "Claude Code lokal", "ket": ["Ivan salin-tempel antar-AI,", "sering buka sesi baru"], "penanda": ["P10"]}
+  ],
+  "legenda": {
+    "rilis": "jalur rilis, dimulai dari restu Ivan",
+    "manual": "salin-tempel manual oleh Ivan",
+    "penanda": "masalah terbukti (§2.5 brief)"
+  },
+  "daftar_penanda": {
+    "judul": "11 masalah yang sudah terbukti",
+    "isi": [
+      {"kode": "P1", "teks": "Satu agent utama; ia berhenti, kantor berhenti"},
+      {"kode": "P2", "teks": "Surat bisa tertahan diam-diam"},
+      {"kode": "P3", "teks": "Pasang admin butuh PowerShell oleh Ivan"},
+      {"kode": "P4", "teks": "Catatan keputusan punya beberapa salinan"},
+      {"kode": "P5", "teks": "Semua meja AI berbagi satu jatah Claude Max"},
+      {"kode": "P6", "teks": "Satu user server menampung semuanya"},
+      {"kode": "P7", "teks": "Pemeriksa terpisah belum permanen"},
+      {"kode": "P8", "teks": "Perencana hanya hidup saat sesi dibuka"},
+      {"kode": "P9", "teks": "Satu server untuk kantor dan etalase"},
+      {"kode": "P10", "teks": "Ivan jadi kurir antar-AI"},
+      {"kode": "P11", "teks": "Riset terdistraksi temuan baru"}
+    ]
+  },
+  "siklus": {
+    "pengantar": "Arsitektur ini akan dirancang ulang lewat",
+    "langkah": ["Brief v1.0", "GPT riset 20 aspek", "Hasil §A–§L", "Ivan & Claude merancang ulang"]
+  },
+  "sumber": "Sumber: BRIEF_RISET_ANS_IDEAL.md v1.0, §2.2–§2.5. Penempatan lencana per langkah atau jalur adalah tafsiran visual Claude."
+}

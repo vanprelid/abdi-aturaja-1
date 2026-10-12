@@ -1,0 +1,217 @@
+<meta charset="utf-8">
+<title>Arsitektur Sistem ANS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Swimlane: jalur mendatar = siapa/di mana, kolom = urutan; garis siku hanya di celah antar-kolom */
+:root{
+  --bg:#EEF1F6; --paper:#FFFFFF; --lane:#F5F7FA; --card:#FFFFFF; --ink:#0F172A; --muted:#64748B;
+  --flow:#334155; --rel:#16A34A; --bad:#E11D48; --shadow:rgba(15,23,42,.10); --accent:#2563EB;
+  --w0:#0F172A;--w1:#7C3AED;--w2:#2563EB;--w3:#0D9488;
+  --f-ui:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#080C16; --paper:#0F1522; --lane:#161E2E; --card:#1C2638; --ink:#EEF2F8; --muted:#94A3B8;
+  --flow:#CBD5E1; --rel:#4ADE80; --bad:#FB7185; --shadow:rgba(0,0,0,.45); --accent:#60A5FA;
+  --w0:#475569;--w1:#8B5CF6;--w2:#3B82F6;--w3:#14B8A6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#080C16; --paper:#0F1522; --lane:#161E2E; --card:#1C2638; --ink:#EEF2F8; --muted:#94A3B8;
+  --flow:#CBD5E1; --rel:#4ADE80; --bad:#FB7185; --shadow:rgba(0,0,0,.45); --accent:#60A5FA;
+  --w0:#475569;--w1:#8B5CF6;--w2:#3B82F6;--w3:#14B8A6; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:14px;line-height:1.5}
+.wrap{max-width:1780px;margin:0 auto;padding-inline:24px;padding-block:28px 36px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px 40px;margin-bottom:18px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-weight:800;font-size:clamp(26px,3.6vw,44px);line-height:1.05;letter-spacing:-.02em;margin:4px 0 0;text-wrap:balance}
+header p{margin:8px 0 0;color:var(--muted);max-width:64ch;font-size:15px}
+.scope{font-size:13px;color:var(--muted);max-width:400px;border-left:3px solid var(--accent);padding-left:14px}
+.scope b{color:var(--ink);font-weight:700}
+figure{margin:0;background:var(--paper);border-radius:20px;padding:18px;box-shadow:0 1px 2px var(--shadow),0 12px 32px -12px var(--shadow)}
+.scroll{overflow-x:auto}
+svg{display:block;width:100%;height:auto;min-width:1000px;font-family:var(--f-ui)}
+.below{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:28px;margin-top:18px;padding:4px 6px 0}
+.below h2{font-size:12px;font-family:var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.legend{display:grid;gap:9px;font-size:13.5px}
+.below.solo{grid-template-columns:1fr}
+.below.solo .legend{display:flex;flex-wrap:wrap;gap:10px 28px}
+.hint{display:none;font-size:12.5px;color:var(--muted);margin:0 0 8px}
+@media (max-width:900px){.hint{display:block}}
+.legend span{display:flex;align-items:center;gap:12px}
+.legend i{flex:none;width:40px;height:0;border-top:2.5px solid var(--flow)}
+.legend i.g-rilis{border-color:var(--rel);border-top-width:3px}
+.legend i.g-manual{border-color:var(--bad);border-top-style:dashed}
+.legend i.g-info{border-color:var(--muted);border-top-style:dotted}
+.legend em{font-style:normal;flex:none;width:40px;text-align:center}
+.pill{font-family:var(--f-mono);font-size:11px;font-weight:600;background:var(--bad);color:#fff;border-radius:999px;padding:1px 8px}
+.probs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 28px;font-size:13.5px}
+.probs div{display:grid;grid-template-columns:44px 1fr;align-items:baseline}
+.probs b{font-family:var(--f-mono);font-size:12px;color:var(--bad);font-weight:600}
+.cycle{margin-top:16px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.cycle .c{background:var(--paper);border-radius:999px;padding:5px 14px;color:var(--ink);font-weight:500;box-shadow:0 1px 2px var(--shadow)}
+.cycle .c.hl{background:var(--ink);color:var(--paper)}
+footer{margin-top:14px;font-size:12px;color:var(--muted)}
+@media (max-width:900px){.below{grid-template-columns:1fr}.probs{grid-template-columns:1fr}}
+@media (max-width:700px){.wrap{padding-inline:16px}figure{padding:10px;border-radius:14px}}
+.lane{fill:var(--lane)}
+.tabic{fill:rgba(255,255,255,.18)}
+.tabt{fill:#fff;font-size:16px;font-weight:700}
+.tabs{fill:rgba(255,255,255,.85);font-size:13px;font-weight:500}
+.card{fill:var(--card)}
+.shc{flood-color:var(--shadow);flood-opacity:1}
+.c0{fill:var(--w0)}.c1{fill:var(--w1)}.c2{fill:var(--w2)}.c3{fill:var(--w3)}
+.ig{fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.no{font-family:var(--f-mono);font-size:13px;font-weight:600;fill:var(--muted)}
+.ct{font-size:18.5px;font-weight:700;fill:var(--ink)}
+.cs{font-size:15px;fill:var(--muted);font-weight:500}
+.ghost{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 5}
+.gt{font-size:16px;font-weight:700;fill:var(--ink)}
+.gs{font-size:14px;fill:var(--muted);font-weight:500}
+.ll{font-size:13.5px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--lane);stroke-width:4px;stroke-linejoin:round}
+.ln{fill:none;stroke-linecap:round}
+.lA{stroke:var(--flow);stroke-width:2}
+.lR{stroke:var(--rel);stroke-width:3}
+.lM{stroke:var(--bad);stroke-width:2;stroke-dasharray:6 5;animation:dash 1s linear infinite}
+.lD{stroke:var(--muted);stroke-width:1.8;stroke-dasharray:2 5}
+@keyframes dash{to{stroke-dashoffset:-22}}
+@media (prefers-reduced-motion:reduce){.lM{animation:none}}
+.fA{fill:var(--flow)}.fR{fill:var(--rel)}.fM{fill:var(--bad)}.fD{fill:var(--muted)}
+.pb{fill:var(--bad)}.pbw{fill:#fff}
+.pbt{font-family:var(--f-mono);font-size:11px;font-weight:600;fill:#fff}
+.pbtw{font-family:var(--f-mono);font-size:11px;font-weight:600;fill:#BE123C}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <span class="eyebrow">ANS · keadaan per 12 Okt 2026</span>
+    <h1>Arsitektur Sistem ANS</h1>
+    <p>Satu putaran kerja kantor ANS, dari arahan Ivan sampai app dipakai pengguna. Ikuti langkah 01 sampai 10.</p>
+  </div>
+  <div class="scope"><b>Yang digambar adalah keadaan sekarang.</b> Arsitektur ideal belum ada di brief, karena itu yang sedang diriset GPT. Lencana merah adalah masalah yang sudah terbukti.</div>
+</header>
+<figure>
+<p class="hint">Geser bagan ke samping untuk melihat semua langkah →</p>
+<div class="scroll">
+<svg viewBox="0 0 1876 662" role="img" aria-label="Alur kerja ANS sekarang dalam 10 langkah lintas empat jalur: Ivan memberi arahan, Cowork menyusun surat, pos dan agent utama di server membagi tugas, pekerja membuat di bengkel, bot GitHub membuka PR, Ivan memberi restu, mesin rilis memasang ke etalase, pengguna memakai app.">
+<defs><filter id="sh" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" class="shc"/></filter>
+<marker id="mA" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" class="fA"/></marker>
+<marker id="mR" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" class="fR"/></marker>
+<marker id="mM" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" class="fM"/></marker>
+<marker id="mD" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,1 L9,5 L0,9 z" class="fD"/></marker>
+</defs>
+<rect x="16" y="16" width="1844" height="150" rx="14" class="lane"/>
+<rect x="16" y="16" width="168" height="150" rx="14" class="tab" style="fill:var(--w0)"/>
+<circle cx="46" cy="48" r="15" class="ic tabic"/><g transform="translate(46,48)" class="ig"><path d="M-8,5 l-1,-10 l5,4 l4,-6 l4,6 l5,-4 l-1,10 z"/></g>
+<text x="70" y="53" class="tabt">Owner</text>
+<text x="34" y="84" class="tabs">Ivan</text>
+<rect x="34.0" y="132" width="28.4" height="19" rx="9.5" class="pbw"/><text x="48.2" y="145.5" class="pbtw" text-anchor="middle">P3</text>
+<rect x="16" y="176" width="1844" height="150" rx="14" class="lane"/>
+<rect x="16" y="176" width="168" height="150" rx="14" class="tab" style="fill:var(--w1)"/>
+<circle cx="46" cy="208" r="15" class="ic tabic"/><g transform="translate(46,208)" class="ig"><rect x="-7" y="-6" width="14" height="9" rx="1"/><path d="M-9,6 h18"/></g>
+<text x="70" y="213" class="tabt">Laptop Ivan</text>
+<text x="34" y="244" class="tabs">Claude desktop</text>
+<rect x="34.0" y="292" width="28.4" height="19" rx="9.5" class="pbw"/><text x="48.2" y="305.5" class="pbtw" text-anchor="middle">P4</text>
+<rect x="67.4" y="292" width="28.4" height="19" rx="9.5" class="pbw"/><text x="81.6" y="305.5" class="pbtw" text-anchor="middle">P8</text>
+<rect x="100.8" y="292" width="35.6" height="19" rx="9.5" class="pbw"/><text x="118.6" y="305.5" class="pbtw" text-anchor="middle">P10</text>
+<rect x="141.4" y="292" width="35.6" height="19" rx="9.5" class="pbw"/><text x="159.2" y="305.5" class="pbtw" text-anchor="middle">P11</text>
+<rect x="16" y="336" width="1844" height="150" rx="14" class="lane"/>
+<rect x="16" y="336" width="168" height="150" rx="14" class="tab" style="fill:var(--w2)"/>
+<circle cx="46" cy="368" r="15" class="ic tabic"/><g transform="translate(46,368)" class="ig"><rect x="-7" y="-8" width="14" height="7" rx="1.5"/><rect x="-7" y="1" width="14" height="7" rx="1.5"/><path d="M-4,-4.5 h1 M-4,4.5 h1"/></g>
+<text x="70" y="373" class="tabt">Server ANS-1A</text>
+<text x="34" y="404" class="tabs">1 VPS · 1 user</text>
+<rect x="34.0" y="452" width="28.4" height="19" rx="9.5" class="pbw"/><text x="48.2" y="465.5" class="pbtw" text-anchor="middle">P6</text>
+<rect x="67.4" y="452" width="28.4" height="19" rx="9.5" class="pbw"/><text x="81.6" y="465.5" class="pbtw" text-anchor="middle">P9</text>
+<rect x="16" y="496" width="1844" height="150" rx="14" class="lane"/>
+<rect x="16" y="496" width="168" height="150" rx="14" class="tab" style="fill:var(--w3)"/>
+<circle cx="46" cy="528" r="15" class="ic tabic"/><g transform="translate(46,528)" class="ig"><path d="M-6,6 a4,4 0 0 1 0,-8 a6,6 0 0 1 11,-1 a4,4 0 0 1 1,9 z"/></g>
+<text x="70" y="533" class="tabt">Layanan luar</text>
+<text x="34" y="564" class="tabs">GitHub · akun AI</text>
+<rect x="34.0" y="612" width="28.4" height="19" rx="9.5" class="pbw"/><text x="48.2" y="625.5" class="pbtw" text-anchor="middle">P5</text>
+<path d="M362,91.0 H362.0 Q370.0,91.0 370.0,99.0 V243.0 Q370.0,251.0 378.0,251.0 H376" class="ln lA" marker-end="url(#mA)"/>
+<path d="M528,265.0 H528.0 Q536.0,265.0 536.0,273.0 V403.0 Q536.0,411.0 544.0,411.0 H542" class="ln lA" marker-end="url(#mA)"/>
+<path d="M694,411.0 H708" class="ln lA" marker-end="url(#mA)"/>
+<path d="M860,411.0 H874" class="ln lA" marker-end="url(#mA)"/>
+<path d="M1026,411.0 H1026.0 Q1034.0,411.0 1034.0,419.0 V563.0 Q1034.0,571.0 1042.0,571.0 H1040" class="ln lA" marker-end="url(#mA)"/>
+<path d="M1192,571.0 H1192.0 Q1200.0,571.0 1200.0,563.0 V99.0 Q1200.0,91.0 1208.0,91.0 H1206" class="ln lA" marker-end="url(#mA)"/>
+<path d="M1358,91.0 H1358.0 Q1366.0,91.0 1366.0,99.0 V403.0 Q1366.0,411.0 1374.0,411.0 H1372" class="ln lR" marker-end="url(#mR)"/>
+<path d="M1524,411.0 H1538" class="ln lR" marker-end="url(#mR)"/>
+<path d="M1690,411.0 H1690.0 Q1698.0,411.0 1698.0,419.0 V563.0 Q1698.0,571.0 1706.0,571.0 H1704" class="ln lA" marker-end="url(#mA)"/>
+<path d="M528,221.0 H550" class="ln lM" marker-end="url(#mM)"/>
+<rect x="554" y="201.0" width="206.39999999999998" height="100" rx="12" class="ghost"/>
+<text x="570" y="231.0" class="gt">Claude Code lokal</text>
+<text x="570" y="253.0" class="gs">Ivan salin-tempel antar-AI,</text>
+<text x="570" y="271.0" class="gs">sering buka sesi baru</text>
+<rect x="718.8" y="192.0" width="35.6" height="19" rx="9.5" class="pb"/><text x="736.6" y="205.5" class="pbt" text-anchor="middle">P10</text>
+<rect x="212" y="31.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="240" cy="59.0" r="17" class="ic c0"/><g transform="translate(240,59.0)" class="ig"><circle cx="0" cy="-4" r="4"/><path d="M-7,8 a7,7 0 0 1 14,0"/></g>
+<text x="348" y="64.0" class="no" text-anchor="end">01</text>
+<text x="226" y="103.0" class="ct">Ivan</text>
+<text x="226" y="124.0" class="cs">arahan &amp;</text>
+<text x="226" y="141.0" class="cs">keputusan bisnis</text>
+<rect x="378" y="191.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="406" cy="219.0" r="17" class="ic c1"/><g transform="translate(406,219.0)" class="ig"><path d="M-8,-6 h16 v10 h-9 l-4,4 v-4 h-3 z"/></g>
+<text x="514" y="224.0" class="no" text-anchor="end">02</text>
+<text x="392" y="263.0" class="ct">Cowork</text>
+<text x="392" y="284.0" class="cs">perencana,</text>
+<text x="392" y="301.0" class="cs">menyusun surat</text>
+<rect x="544" y="351.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="572" cy="379.0" r="17" class="ic c2"/><g transform="translate(572,379.0)" class="ig"><rect x="-8" y="-6" width="16" height="12" rx="1.5"/><path d="M-8,-5 l8,6 l8,-6"/></g>
+<text x="680" y="384.0" class="no" text-anchor="end">03</text>
+<text x="558" y="423.0" class="ct">Pos / bel</text>
+<text x="558" y="444.0" class="cs">menerima &amp;</text>
+<text x="558" y="461.0" class="cs">mengantar surat</text>
+<rect x="657.6" y="342.0" width="28.4" height="19" rx="9.5" class="pb"/><text x="671.8" y="355.5" class="pbt" text-anchor="middle">P2</text>
+<rect x="710" y="351.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="738" cy="379.0" r="17" class="ic c2"/><g transform="translate(738,379.0)" class="ig"><circle cx="0" cy="0" r="3"/><circle cx="-7" cy="-6" r="2"/><circle cx="7" cy="-6" r="2"/><circle cx="0" cy="8" r="2"/><path d="M-2,-2 L-5.5,-4.8 M2,-2 L5.5,-4.8 M0,3 V6"/></g>
+<text x="846" y="384.0" class="no" text-anchor="end">04</text>
+<text x="724" y="423.0" class="ct">Agent utama</text>
+<text x="724" y="444.0" class="cs">sesi Claude Code,</text>
+<text x="724" y="461.0" class="cs">membagi tugas</text>
+<rect x="823.6" y="342.0" width="28.4" height="19" rx="9.5" class="pb"/><text x="837.8" y="355.5" class="pbt" text-anchor="middle">P1</text>
+<rect x="876" y="351.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="904" cy="379.0" r="17" class="ic c2"/><g transform="translate(904,379.0)" class="ig"><path d="M5,-8 a5,5 0 0 0 -6,6 l-7,7 l3,3 l7,-7 a5,5 0 0 0 6,-6 l-3,3 l-3,-3 z"/></g>
+<text x="1012" y="384.0" class="no" text-anchor="end">05</text>
+<text x="890" y="423.0" class="ct">Pekerja</text>
+<text x="890" y="444.0" class="cs">Claude / Codex,</text>
+<text x="890" y="461.0" class="cs">kode · UAT · uji</text>
+<rect x="1042" y="511.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="1070" cy="539.0" r="17" class="ic c3"/><g transform="translate(1070,539.0)" class="ig"><circle cx="-5" cy="-7" r="2.2"/><circle cx="-5" cy="7" r="2.2"/><circle cx="6" cy="-3" r="2.2"/><path d="M-5,-4.8 V4.8 M6,-0.8 c0,5 -11,3 -11,6"/></g>
+<text x="1178" y="544.0" class="no" text-anchor="end">06</text>
+<text x="1056" y="583.0" class="ct">GitHub PR</text>
+<text x="1056" y="604.0" class="cs">lewat bot kantor</text>
+<text x="1056" y="621.0" class="cs">+ uji otomatis</text>
+<rect x="1155.6" y="502.0" width="28.4" height="19" rx="9.5" class="pb"/><text x="1169.8" y="515.5" class="pbt" text-anchor="middle">P7</text>
+<rect x="1208" y="31.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="1236" cy="59.0" r="17" class="ic c0"/><g transform="translate(1236,59.0)" class="ig"><path d="M0,-9 l7,3 v5 c0,5 -3,8 -7,10 c-4,-2 -7,-5 -7,-10 v-5 z"/><path d="M-3.5,0 l2.5,2.5 l4.5,-5"/></g>
+<text x="1344" y="64.0" class="no" text-anchor="end">07</text>
+<text x="1222" y="103.0" class="ct">Restu Ivan</text>
+<text x="1222" y="124.0" class="cs">notif Telegram</text>
+<text x="1222" y="141.0" class="cs">→ tekan Merge</text>
+<rect x="1374" y="351.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="1402" cy="379.0" r="17" class="ic c2"/><g transform="translate(1402,379.0)" class="ig"><path d="M0,-9 c4,3 5,8 3,13 h-6 c-2,-5 -1,-10 3,-13 z"/><path d="M-3,4 l-3,4 M3,4 l3,4"/><circle cx="0" cy="-2" r="1.6"/></g>
+<text x="1510" y="384.0" class="no" text-anchor="end">08</text>
+<text x="1388" y="423.0" class="ct">Mesin rilis</text>
+<text x="1388" y="444.0" class="cs">pasang otomatis,</text>
+<text x="1388" y="461.0" class="cs">gagal → kembali</text>
+<rect x="1540" y="351.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="1568" cy="379.0" r="17" class="ic c2"/><g transform="translate(1568,379.0)" class="ig"><rect x="-8" y="-7" width="16" height="11" rx="1.5"/><path d="M-3,8 h6 M0,4 v4"/></g>
+<text x="1676" y="384.0" class="no" text-anchor="end">09</text>
+<text x="1554" y="423.0" class="ct">Etalase</text>
+<text x="1554" y="444.0" class="cs">app produksi,</text>
+<text x="1554" y="461.0" class="cs">tanpa tangan agen</text>
+<rect x="1706" y="511.0" width="150" height="120" rx="12" class="card" filter="url(#sh)"/>
+<circle cx="1734" cy="539.0" r="17" class="ic c3"/><g transform="translate(1734,539.0)" class="ig"><circle cx="-3" cy="-4" r="3.2"/><path d="M-9,7 a6,6 0 0 1 12,0"/><circle cx="5" cy="-3" r="2.6"/><path d="M4,2 a5,5 0 0 1 6,5"/></g>
+<text x="1842" y="544.0" class="no" text-anchor="end">10</text>
+<text x="1720" y="583.0" class="ct">Pengguna</text>
+<text x="1720" y="604.0" class="cs">klien &amp; pengguna,</text>
+<text x="1720" y="621.0" class="cs">kunci AI klien</text>
+</svg>
+</div>
+<div class="below"><div><h2>Cara membaca</h2><div class="legend"><span><i class="g-alur"></i>alur kerja</span><span><i class="g-rilis"></i>jalur rilis, dimulai dari restu Ivan</span><span><i class="g-manual"></i>salin-tempel manual oleh Ivan</span><span><em><span class="pill">P1</span></em>masalah terbukti (§2.5 brief)</span></div></div><div><h2>11 masalah yang sudah terbukti</h2><div class="probs"><div><b>P1</b>Satu agent utama; ia berhenti, kantor berhenti</div><div><b>P2</b>Surat bisa tertahan diam-diam</div><div><b>P3</b>Pasang admin butuh PowerShell oleh Ivan</div><div><b>P4</b>Catatan keputusan punya beberapa salinan</div><div><b>P5</b>Semua meja AI berbagi satu jatah Claude Max</div><div><b>P6</b>Satu user server menampung semuanya</div><div><b>P7</b>Pemeriksa terpisah belum permanen</div><div><b>P8</b>Perencana hanya hidup saat sesi dibuka</div><div><b>P9</b>Satu server untuk kantor dan etalase</div><div><b>P10</b>Ivan jadi kurir antar-AI</div><div><b>P11</b>Riset terdistraksi temuan baru</div></div></div></div>
+</figure>
+<div class="cycle"><span>Arsitektur ini akan dirancang ulang lewat</span><span class="c">Brief v1.0</span><span class="ar">→</span><span class="c">GPT riset 20 aspek</span><span class="ar">→</span><span class="c">Hasil §A–§L</span><span class="ar">→</span><span class="c hl">Ivan &amp; Claude merancang ulang</span></div>
+<footer>Sumber: BRIEF_RISET_ANS_IDEAL.md v1.0, §2.2–§2.5. Penempatan lencana per langkah atau jalur adalah tafsiran visual Claude.</footer>
+</div>
